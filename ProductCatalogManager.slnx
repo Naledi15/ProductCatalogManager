@@ -2,5 +2,6 @@
   <Folder Name="/src/" />
   <Folder Name="/src/ProductCatalogManager.Server/">
     <Project Path="src/ProductCatalogManager.Server/ProductCatalogManager.API/ProductCatalogManager.API.csproj" />
+    <Project Path="src/ProductCatalogManager.Server/ProductCatalogManager.Domain/ProductCatalogManager.Domain.csproj" />
   </Folder>
 </Solution>
