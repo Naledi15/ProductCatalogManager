@@ -1,0 +1,32 @@
+@let categories = (categories$ | async) ?? [];
+
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Products</h1>
+      <p class="page-subtitle">Manage your product catalog</p>
+    </div>
+    <a routerLink="/products/new" class="btn-add">+ Add Product</a>
+  </div>
+
+  <div class="filters">
+    <div class="search-wrapper">
+      <app-search-bar (search)="onSearch($event)" />
+    </div>
+    <div class="filter-wrapper">
+      <app-category-filter
+        [categories]="categories"
+        [selectedId]="selectedCategoryId$ | async"
+        (categoryChange)="onCategoryChange($event)"
+      />
+    </div>
+  </div>
+
+  <app-product-list
+    [products]="(filteredProducts$ | async) ?? []"
+    [categories]="categories"
+    [loading]="(loading$ | async) ?? true"
+    (edit)="onEdit($event)"
+    (delete)="onDelete($event)"
+  />
+</div>

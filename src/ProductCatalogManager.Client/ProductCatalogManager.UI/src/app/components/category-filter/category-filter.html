@@ -1,0 +1,6 @@
+<select class="filter-select" (change)="onChange($any($event.target).value)" [value]="selectedId() ?? ''">
+  <option value="">All Categories</option>
+  @for (category of categories(); track category.id) {
+    <option [value]="category.id" [selected]="selectedId() === category.id">{{ category.name }}</option>
+  }
+</select>
