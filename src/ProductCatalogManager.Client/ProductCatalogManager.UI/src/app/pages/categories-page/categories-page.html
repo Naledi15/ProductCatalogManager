@@ -1,0 +1,90 @@
+@let categories = (categories$ | async) ?? [];
+@let parentOptions = (parentOptions$ | async) ?? [];
+
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Categories</h1>
+      <p class="page-subtitle">Manage product categories</p>
+    </div>
+    @if (!showForm()) {
+      <button class="btn-add" (click)="startAdd()">+ Add Category</button>
+    }
+  </div>
+
+  @if (showForm()) {
+    <div class="form-card">
+      <h3>{{ editingId ? 'Edit Category' : 'New Category' }}</h3>
+      @if (error()) {
+        <div class="error-banner">{{ error() }}</div>
+      }
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <div class="form-group">
+          <label>Name *</label>
+          <input type="text" formControlName="name" class="form-control"
+                 [class.invalid]="f['name'].invalid && f['name'].touched" />
+          @if (f['name'].errors?.['required'] && f['name'].touched) {
+            <span class="field-error">Name is required.</span>
+          } @else if (f['name'].errors?.['minlength'] && f['name'].touched) {
+            <span class="field-error">Name must be at least 2 characters.</span>
+          }
+        </div>
+        <div class="form-group">
+          <label>Description *</label>
+          <input type="text" formControlName="description" class="form-control"
+                 [class.invalid]="f['description'].invalid && f['description'].touched" />
+          @if (f['description'].errors?.['required'] && f['description'].touched) {
+            <span class="field-error">Description is required.</span>
+          }
+        </div>
+        <div class="form-group">
+          <label>Parent Category <span class="optional">(optional — leave blank for root)</span></label>
+          <select formControlName="parentCategoryId" class="form-control">
+            <option [value]="null">None (root category)</option>
+            @for (cat of parentOptions; track cat.id) {
+              <option [value]="cat.id">{{ cat.name }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" (click)="cancelForm()">Cancel</button>
+          <button type="submit" class="btn btn-primary" [disabled]="loading()">
+            {{ loading() ? 'Saving...' : (editingId ? 'Update' : 'Add Category') }}
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+
+  <div class="categories-list">
+    @for (category of categories; track category.id) {
+      <div class="category-card" [class.is-child]="category.parentCategoryId !== null">
+        <div class="category-info">
+          <div class="category-name-row">
+            <strong>{{ category.name }}</strong>
+            @if (getParentName(category.parentCategoryId, categories); as parentName) {
+              <span class="parent-badge">under {{ parentName }}</span>
+            }
+          </div>
+          <span class="category-desc">{{ category.description }}</span>
+        </div>
+        <div class="category-actions">
+          <button class="btn btn-edit" (click)="startEdit(category)">Edit</button>
+          <button class="btn btn-delete" (click)="onDelete(category.id)">Delete</button>
+        </div>
+      </div>
+    }
+    @if (categories.length === 0) {
+      <div class="empty-state">No categories yet.</div>
+    }
+  </div>
+</div>
+
+@if (confirmDeleteId() !== null) {
+  <app-confirm-dialog
+    message="Delete this category? Products in this category will not be affected."
+    confirmLabel="Delete"
+    (confirmed)="confirmDelete()"
+    (cancelled)="confirmDeleteId.set(null)"
+  />
+}
