@@ -27,8 +27,8 @@
   box-sizing: border-box;
 
   &:focus {
-    border-color: #4f46e5;
-    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    border-color: #dc2626;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
   }
 }
 
@@ -46,6 +46,6 @@
   align-items: center;
 
   &:hover {
-    color: #4f46e5;
+    color: #dc2626;
   }
 }
