@@ -52,3 +52,14 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+
+# Angular
+node_modules/
+dist/
+.angular/
+.sass-cache/
+*.js.map
+npm-debug.log
+yarn-error.log
+.env
+.env.local
