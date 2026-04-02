@@ -1,0 +1,100 @@
+<div class="form-page">
+  <div class="form-header">
+    <button class="back-btn" (click)="cancel()" type="button">&#8592; Back</button>
+    <h2>{{ isEdit() ? 'Edit Product' : 'Add New Product' }}</h2>
+  </div>
+
+  @if (loading() && isEdit()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading product...</p>
+    </div>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="submit()" class="product-form" novalidate>
+      @if (error()) {
+        <div class="error-banner">{{ error() }}</div>
+      }
+
+      <div class="form-row">
+        <div class="form-group" style="flex: 2">
+          <label for="name">Product Name *</label>
+          <input id="name" type="text" formControlName="name" class="form-control"
+                 [class.invalid]="f['name'].invalid && f['name'].touched" />
+          @if (f['name'].errors?.['required'] && f['name'].touched) {
+            <span class="field-error">Name is required.</span>
+          } @else if (f['name'].errors?.['minlength'] && f['name'].touched) {
+            <span class="field-error">Name must be at least 2 characters.</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="sku">SKU *</label>
+          <input id="sku" type="text" formControlName="sku" class="form-control"
+                 placeholder="e.g. LAP-001"
+                 [class.invalid]="f['sku'].invalid && f['sku'].touched" />
+          @if (f['sku'].errors?.['required'] && f['sku'].touched) {
+            <span class="field-error">SKU is required.</span>
+          } @else if (f['sku'].errors?.['pattern'] && f['sku'].touched) {
+            <span class="field-error">Only uppercase letters, numbers, and hyphens.</span>
+          }
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description *</label>
+        <textarea id="description" formControlName="description" class="form-control" rows="3"
+                  [class.invalid]="f['description'].invalid && f['description'].touched"></textarea>
+        @if (f['description'].errors?.['required'] && f['description'].touched) {
+          <span class="field-error">Description is required.</span>
+        }
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="price">Price *</label>
+          <input id="price" type="number" formControlName="price" class="form-control"
+                 step="0.01" min="0.01" placeholder="0.00"
+                 [class.invalid]="f['price'].invalid && f['price'].touched" />
+          @if (f['price'].errors?.['required'] && f['price'].touched) {
+            <span class="field-error">Price is required.</span>
+          } @else if (f['price'].errors?.['min'] && f['price'].touched) {
+            <span class="field-error">Price must be greater than 0.</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="quantity">Quantity *</label>
+          <input id="quantity" type="number" formControlName="quantity" class="form-control"
+                 min="0" placeholder="0"
+                 [class.invalid]="f['quantity'].invalid && f['quantity'].touched" />
+          @if (f['quantity'].errors?.['required'] && f['quantity'].touched) {
+            <span class="field-error">Quantity is required.</span>
+          } @else if (f['quantity'].errors?.['min'] && f['quantity'].touched) {
+            <span class="field-error">Quantity cannot be negative.</span>
+          }
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="categoryId">Category *</label>
+        <select id="categoryId" formControlName="categoryId" class="form-control"
+                [class.invalid]="f['categoryId'].invalid && f['categoryId'].touched">
+          <option [value]="null" disabled>Select a category</option>
+          @for (category of (categories$ | async) ?? []; track category.id) {
+            <option [value]="category.id">{{ category.name }}</option>
+          }
+        </select>
+        @if (f['categoryId'].errors?.['required'] && f['categoryId'].touched) {
+          <span class="field-error">Category is required.</span>
+        }
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="cancel()">Cancel</button>
+        <button type="submit" class="btn btn-primary" [disabled]="loading()">
+          @if (loading()) { Saving... } @else { {{ isEdit() ? 'Update Product' : 'Add Product' }} }
+        </button>
+      </div>
+    </form>
+  }
+</div>
