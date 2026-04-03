@@ -8,7 +8,6 @@ public class CategoryRepository : Repository<CategoryDTO>, ICategoryRepository
     protected override int GetId(CategoryDTO entity) => entity.Id;
     protected override CategoryDTO WithId(CategoryDTO entity, int id) => entity with { Id = id };
 
-    public Task<IEnumerable<CategoryDTO>> GetByParentIdAsync(int? parentCategoryId) =>
-        GetAllAsync().ContinueWith(t =>
-            t.Result.Where(c => c.ParentCategoryId == parentCategoryId));
+    public async Task<IEnumerable<CategoryDTO>> GetByParentIdAsync(int? parentCategoryId) =>
+        (await GetAllAsync()).Where(c => c.ParentCategoryId == parentCategoryId);
 }
