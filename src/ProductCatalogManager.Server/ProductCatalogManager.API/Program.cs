@@ -14,7 +14,7 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<CatalogDbContext>(options =>
     options.UseInMemoryDatabase("ProductCatalogDb"));
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
-builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddSingleton<ICategoryRepository, CategoryRepository>();
 
 var app = builder.Build();
 
