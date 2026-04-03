@@ -3,5 +3,6 @@
   <Folder Name="/src/ProductCatalogManager.Server/">
     <Project Path="src/ProductCatalogManager.Server/ProductCatalogManager.API/ProductCatalogManager.API.csproj" />
     <Project Path="src/ProductCatalogManager.Server/ProductCatalogManager.Domain/ProductCatalogManager.Domain.csproj" />
+    <Project Path="src/ProductCatalogManager.Server/ProductCatalogManager.Services/ProductCatalogManager.Services.csproj" />
   </Folder>
 </Solution>
