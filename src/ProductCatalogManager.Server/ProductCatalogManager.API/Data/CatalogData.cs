@@ -10,6 +10,9 @@ public static class CatalogData
         var categories = services.GetRequiredService<ICategoryRepository>();
         var products = services.GetRequiredService<IProductRepository>();
 
+        if ((await categories.GetAllAsync()).Any() || (await products.GetAllAsync()).Any())
+            return;
+
         // Repository<T> assigns IDs starting from 1 in insertion order
         // id 1
         await categories.AddAsync(new CategoryDTO(0, "Science", "Mathematics, physics, chemistry and biology textbooks", null));

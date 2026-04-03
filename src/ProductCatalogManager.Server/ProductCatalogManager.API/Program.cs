@@ -1,4 +1,6 @@
+using Microsoft.EntityFrameworkCore;
 using ProductCatalogManager.API.Data;
+using ProductCatalogManager.Domain.Data;
 using ProductCatalogManager.Domain.Interfaces;
 using ProductCatalogManager.Domain.Repositories;
 using Scalar.AspNetCore;
@@ -9,8 +11,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
-builder.Services.AddSingleton<IProductRepository, ProductRepository>();
-builder.Services.AddSingleton<ICategoryRepository, CategoryRepository>();
+builder.Services.AddDbContext<CatalogDbContext>(options =>
+    options.UseInMemoryDatabase("ProductCatalogDb"));
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 
 var app = builder.Build();
 
@@ -29,6 +33,9 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.MapControllers();
 
-await CatalogData.SeedAsync(app.Services);
+using (var scope = app.Services.CreateScope())
+{
+    await CatalogData.SeedAsync(scope.ServiceProvider);
+}
 
 app.Run();
