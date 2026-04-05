@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using ProductCatalogManager.API.Contracts.Requests.Products;
 using ProductCatalogManager.Domain.DTOs;
 using ProductCatalogManager.Domain.Interfaces;
+using ProductCatalogManager.Queries;
 
 namespace ProductCatalogManager.API.Controllers;
 
@@ -14,18 +15,20 @@ public class ProductsController(IProductRepository products) : ControllerBase
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 10,
         [FromQuery] int? categoryId = null,
-        [FromQuery] string? search = null)
+        [FromQuery] string? search = null,
+        [FromQuery] decimal? minPrice = null,
+        [FromQuery] decimal? maxPrice = null,
+        [FromQuery] bool inStock = false,
+        [FromQuery] string? sortBy = null)
     {
-        var query = (await products.GetAllAsync()).AsQueryable();
-
-        if (categoryId.HasValue)
-            query = query.Where(p => p.CategoryId == categoryId.Value);
-
-        if (!string.IsNullOrWhiteSpace(search))
-            query = query.Where(p => p.Name.Contains(search, StringComparison.OrdinalIgnoreCase));
-
-        var totalCount = query.Count();
-        var items = query.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+        var (items, totalCount) = (await products.GetAllAsync())
+            .AsQueryable()
+            .InCategory(categoryId)
+            .MatchingSearch(search)
+            .InPriceRange(minPrice, maxPrice)
+            .InStockOnly(inStock)
+            .SortBy(sortBy)
+            .ToPage(page, pageSize);
 
         return Ok(new
         {
