@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using ProductCatalogManager.API.Contracts.Category;
 using ProductCatalogManager.Domain.DTOs;
 using ProductCatalogManager.Domain.Interfaces;
 
@@ -33,8 +34,6 @@ public class CategoriesController(ICategoryRepository categories) : ControllerBa
             .Select(c => new CategoryTreeNode(c.Id, c.Name, c.Description, c.ParentCategoryId, BuildTree(all, c.Id)))
             .ToList();
 }
-
-public record CategoryRequest(string Name, string Description, int? ParentCategoryId);
 
 public record CategoryTreeNode(
     int Id,
