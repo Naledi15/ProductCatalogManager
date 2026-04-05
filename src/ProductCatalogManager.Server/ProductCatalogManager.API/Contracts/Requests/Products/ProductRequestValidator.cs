@@ -1,7 +1,6 @@
 using FluentValidation;
-using ProductCatalogManager.API.Contracts.Requests.Products;
 
-namespace ProductCatalogManager.API.Validators;
+namespace ProductCatalogManager.API.Contracts.Requests.Products;
 
 public sealed class ProductRequestValidator : AbstractValidator<ProductRequest>
 {
