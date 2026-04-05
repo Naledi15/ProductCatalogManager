@@ -8,7 +8,9 @@ namespace ProductCatalogManager.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ProductsController(IProductRepository products) : ControllerBase
+public class ProductsController(
+    IProductRepository products,
+    IProductSearchEngine searchEngine) : ControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> GetProducts(
@@ -45,6 +47,15 @@ public class ProductsController(IProductRepository products) : ControllerBase
     {
         var product = await products.GetByIdAsync(id);
         return product is null ? NotFound() : Ok(product);
+    }
+
+    [HttpGet("search")]
+    public async Task<IActionResult> SearchProducts(
+        [FromQuery] string? name = null,
+        [FromQuery] int? categoryId = null)
+    {
+        var results = await searchEngine.SearchAsync(name, categoryId);
+        return Ok(results);
     }
 
     [HttpPost]

@@ -1,9 +1,9 @@
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using ProductCatalogManager.API.Contracts.Requests.Products;
 using ProductCatalogManager.API.Data;
 using ProductCatalogManager.API.Filters;
 using ProductCatalogManager.API.Middleware;
-using ProductCatalogManager.API.Contracts.Requests.Products;
 using ProductCatalogManager.Domain.Data;
 using ProductCatalogManager.Domain.Interfaces;
 using ProductCatalogManager.Domain.Repositories;
@@ -19,6 +19,7 @@ builder.Services.AddDbContext<CatalogDbContext>(options =>
     options.UseInMemoryDatabase("ProductCatalogDb"));
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddSingleton<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IProductSearchEngine, ProductSearchEngine>();
 builder.Services.AddValidatorsFromAssemblyContaining<ProductRequestValidator>();
 
 var app = builder.Build();
