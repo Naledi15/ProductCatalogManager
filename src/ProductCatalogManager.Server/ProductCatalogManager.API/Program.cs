@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using ProductCatalogManager.API.Data;
+using ProductCatalogManager.API.Middleware;
 using ProductCatalogManager.Domain.Data;
 using ProductCatalogManager.Domain.Interfaces;
 using ProductCatalogManager.Domain.Repositories;
@@ -17,6 +18,8 @@ builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddSingleton<ICategoryRepository, CategoryRepository>();
 
 var app = builder.Build();
+var requestAuditMiddleware =
+    new RequestAuditMiddleware(app.Services.GetRequiredService<ILogger<RequestAuditMiddleware>>());
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -29,6 +32,11 @@ if (app.Environment.IsDevelopment())
                .WithOpenApiRoutePattern("/openapi/v1.json");
     });
 }
+
+app.Use(async (context, next) =>
+{
+    await requestAuditMiddleware.InvokeAsync(context, next);
+});
 
 app.UseHttpsRedirection();
 app.MapControllers();
