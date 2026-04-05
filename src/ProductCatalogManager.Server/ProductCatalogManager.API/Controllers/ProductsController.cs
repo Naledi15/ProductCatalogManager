@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using ProductCatalogManager.API.Contracts.Products;
 using ProductCatalogManager.Domain.DTOs;
 using ProductCatalogManager.Domain.Interfaces;
 
@@ -79,11 +80,3 @@ public class ProductsController(IProductRepository products) : ControllerBase
         return NoContent();
     }
 }
-
-public record ProductRequest(
-    string Name,
-    string Description,
-    string Sku,
-    decimal Price,
-    int Quantity,
-    int CategoryId);
