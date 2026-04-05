@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using ProductCatalogManager.API.Contracts.Products;
+using ProductCatalogManager.API.Contracts.Requests.Products;
 using ProductCatalogManager.Domain.DTOs;
 using ProductCatalogManager.Domain.Interfaces;
 

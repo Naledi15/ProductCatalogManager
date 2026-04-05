@@ -8,10 +8,14 @@ public sealed class RequestAuditMiddleware(ILogger<RequestAuditMiddleware> logge
     {
         var stopwatch = Stopwatch.StartNew();
 
-        await next(context);
+        context.Response.OnStarting(() =>
+        {
+            stopwatch.Stop();
+            context.Response.Headers["X-Response-Time-Ms"] = stopwatch.ElapsedMilliseconds.ToString();
+            return Task.CompletedTask;
+        });
 
-        stopwatch.Stop();
-        context.Response.Headers["X-Response-Time-Ms"] = stopwatch.ElapsedMilliseconds.ToString();
+        await next(context);
 
         logger.LogInformation(
             "{Method} {Path} responded {StatusCode} in {ElapsedMs} ms",

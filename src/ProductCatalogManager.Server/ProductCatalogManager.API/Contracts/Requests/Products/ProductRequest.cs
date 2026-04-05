@@ -1,4 +1,4 @@
-namespace ProductCatalogManager.API.Contracts.Products;
+namespace ProductCatalogManager.API.Contracts.Requests.Products;
 
 public sealed record ProductRequest(
     string Name,
