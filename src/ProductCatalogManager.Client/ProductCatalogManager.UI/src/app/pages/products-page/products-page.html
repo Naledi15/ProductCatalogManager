@@ -21,16 +21,23 @@
       />
     </div>
     <div class="sort-wrapper">
-      <select class="sort-select" [value]="sortBy$ | async" (change)="onSortChange($any($event.target).value)">
-        @for (opt of sortOptions; track opt.value) {
-          <option [value]="opt.value">{{ opt.label }}</option>
-        }
+      <select class="sort-select" [value]="selectedDropdownValue" (change)="onSortChange($any($event.target).value)">
+        <optgroup label="Sort by">
+          @for (opt of sortOptions; track opt.value) {
+            <option [value]="opt.value">{{ opt.label }}</option>
+          }
+        </optgroup>
+        <optgroup label="Stock">
+          @for (opt of stockOptions; track opt.value) {
+            <option [value]="opt.value">{{ opt.label }}</option>
+          }
+        </optgroup>
       </select>
     </div>
   </div>
 
   <app-product-list
-    [products]="(products$ | async) ?? []"
+    [products]="(displayProducts$ | async) ?? []"
     [categories]="categories"
     [loading]="(loading$ | async) ?? true"
     (edit)="onEdit($event)"
