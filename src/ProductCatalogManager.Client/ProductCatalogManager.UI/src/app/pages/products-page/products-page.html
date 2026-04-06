@@ -23,7 +23,7 @@
   </div>
 
   <app-product-list
-    [products]="(filteredProducts$ | async) ?? []"
+    [products]="(products$ | async) ?? []"
     [categories]="categories"
     [loading]="(loading$ | async) ?? true"
     (edit)="onEdit($event)"

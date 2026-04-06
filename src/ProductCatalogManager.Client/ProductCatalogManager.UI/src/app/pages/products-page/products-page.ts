@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { AsyncPipe } from '@angular/common';
 import { BehaviorSubject, combineLatest } from 'rxjs';
-import { debounceTime, map, startWith } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, startWith, switchMap } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { ProductService } from '../../services/product.service';
@@ -27,29 +27,20 @@ export class ProductsPage {
   readonly selectedCategoryId$ = new BehaviorSubject<number | null>(null);
 
   readonly categories$ = this.categoryService.categories$;
+  readonly products$ = this.productService.products$;
+  readonly loading$ = this.productService.loading$;
 
-  readonly loading$ = this.productService.products$.pipe(
-    map(() => false),
-    startWith(true),
-    takeUntilDestroyed(),
-  );
-
-  readonly filteredProducts$ = combineLatest([
-    this.productService.products$,
-    this.searchTerm$.pipe(debounceTime(250), startWith('')),
-    this.selectedCategoryId$,
-  ]).pipe(
-    map(([products, term, catId]) => {
-      let result = products;
-      const t = term.toLowerCase().trim();
-      if (t) result = result.filter(p =>
-        p.name.toLowerCase().includes(t) || p.description.toLowerCase().includes(t)
-      );
-      if (catId !== null) result = result.filter(p => p.categoryId === catId);
-      return result;
-    }),
-    takeUntilDestroyed(),
-  );
+  constructor() {
+    combineLatest([
+      this.searchTerm$.pipe(debounceTime(300), distinctUntilChanged(), startWith('')),
+      this.selectedCategoryId$,
+    ]).pipe(
+      switchMap(([search, categoryId]) =>
+        this.productService.loadProducts({ search: search || null, categoryId, page: 1, pageSize: 20 }),
+      ),
+      takeUntilDestroyed(),
+    ).subscribe();
+  }
 
   onSearch(term: string): void { this.searchTerm$.next(term); }
   onCategoryChange(id: number | null): void { this.selectedCategoryId$.next(id); }
