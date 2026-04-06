@@ -1,5 +1,6 @@
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using ProductCatalogManager.API.Contracts.Requests.Products;
 using ProductCatalogManager.API.Data;
 using ProductCatalogManager.API.Filters;
@@ -7,6 +8,7 @@ using ProductCatalogManager.API.Middleware;
 using ProductCatalogManager.Domain.Data;
 using ProductCatalogManager.Domain.Interfaces;
 using ProductCatalogManager.Domain.Repositories;
+using ProductCatalogManager.Domain.Services;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,7 +21,12 @@ builder.Services.AddDbContext<CatalogDbContext>(options =>
     options.UseInMemoryDatabase("ProductCatalogDb"));
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddSingleton<ICategoryRepository, CategoryRepository>();
-builder.Services.AddScoped<IProductSearchEngine, ProductSearchEngine>();
+builder.Services.AddMemoryCache();
+builder.Services.AddScoped<ProductSearchEngine>();
+builder.Services.AddScoped<IProductSearchEngine, SearchResultCaching>(
+    sp => new SearchResultCaching(
+        sp.GetRequiredService<ProductSearchEngine>(),
+        sp.GetRequiredService<IMemoryCache>()));
 builder.Services.AddValidatorsFromAssemblyContaining<ProductRequestValidator>();
 
 var app = builder.Build();

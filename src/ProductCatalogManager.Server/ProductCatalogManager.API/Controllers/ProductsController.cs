@@ -64,6 +64,7 @@ public class ProductsController(
         var now = DateTime.UtcNow;
         var product = await products.AddAsync(
             new ProductDto(0, request.Name, request.Description, request.Sku, request.Price, request.Quantity, request.CategoryId, now, now));
+        searchEngine.Invalidate();
         return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, product);
     }
 
@@ -83,6 +84,7 @@ public class ProductsController(
             CategoryId = request.CategoryId,
             UpdatedAt = DateTime.UtcNow
         });
+        searchEngine.Invalidate();
         return Ok(updated);
     }
 
@@ -91,6 +93,7 @@ public class ProductsController(
     {
         if (await products.GetByIdAsync(id) is null) return NotFound();
         await products.DeleteAsync(id);
+        searchEngine.Invalidate();
         return NoContent();
     }
 }

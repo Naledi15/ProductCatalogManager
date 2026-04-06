@@ -25,4 +25,7 @@ public sealed class ProductSearchEngine(IProductRepository repository) : IProduc
 
         return results;
     }
+
+    // No-op: caching lives in the SearchResultCaching decorator, not here.
+    public void Invalidate() { }
 }
