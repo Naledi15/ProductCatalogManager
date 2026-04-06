@@ -5,6 +5,7 @@ using ProductCatalogManager.API.Contracts.Requests.Products;
 using ProductCatalogManager.API.Data;
 using ProductCatalogManager.API.Filters;
 using ProductCatalogManager.API.Middleware;
+using ProductCatalogManager.API.Serialization;
 using ProductCatalogManager.Domain.Data;
 using ProductCatalogManager.Domain.Interfaces;
 using ProductCatalogManager.Domain.Repositories;
@@ -16,7 +17,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
-builder.Services.AddControllers(options => options.Filters.Add<ValidationFilter>());
+builder.Services.AddControllers(options => options.Filters.Add<ValidationFilter>())
+    .AddJsonOptions(o => o.JsonSerializerOptions.Converters.Add(new CategoryTreeNodeConverter()));
 builder.Services.AddDbContext<CatalogDbContext>(options =>
     options.UseInMemoryDatabase("ProductCatalogDb"));
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
