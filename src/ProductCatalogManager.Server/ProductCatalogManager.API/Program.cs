@@ -1,6 +1,5 @@
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
 using ProductCatalogManager.API.Contracts.Requests.Products;
 using ProductCatalogManager.API.Data;
 using ProductCatalogManager.API.Filters;
@@ -23,7 +22,6 @@ builder.Services.AddDbContext<CatalogDbContext>(options =>
     options.UseInMemoryDatabase("ProductCatalogDb"));
 builder.Services.AddSingleton<IProductRepository, ProductRepository>();
 builder.Services.AddSingleton<ICategoryRepository, CategoryRepository>();
-builder.Services.AddMemoryCache();
 builder.Services.AddKeyedSingleton<CacheLayer>("products");
 builder.Services.AddKeyedSingleton<CacheLayer>("categories");
 builder.Services.AddSingleton<IProductSearchEngine, ProductSearchEngine>();
