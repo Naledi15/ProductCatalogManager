@@ -32,6 +32,10 @@ public static class CatalogData
         await categories.AddAsync(new CategoryDTO(0, "Finance", "Corporate finance, investments and financial markets textbooks", 5));
         // id 9
         await categories.AddAsync(new CategoryDTO(0, "Management", "Organizational behaviour, strategy and leadership textbooks", 5));
+        // id 10
+        await categories.AddAsync(new CategoryDTO(0, "Statistics & Probability", "Statistical theory, probability and data analysis textbooks", 4));
+        // id 11
+        await categories.AddAsync(new CategoryDTO(0, "Discrete Mathematics", "Combinatorics, graph theory and mathematical logic textbooks", 4));
 
         await products.AddAsync(new ProductDto(0, "Introduction to Algorithms", "Comprehensive guide to algorithms and data structures", "TXT-001", 89.99m, 40, 2, new DateTime(2024, 1, 10), new DateTime(2024, 3, 15)));
         await products.AddAsync(new ProductDto(0, "Clean Code", "A handbook of agile software craftsmanship", "TXT-002", 49.99m, 60, 2, new DateTime(2024, 1, 12), new DateTime(2024, 2, 20)));
@@ -54,5 +58,7 @@ public static class CatalogData
         await products.AddAsync(new ProductDto(0, "The Intelligent Investor", "Benjamin Graham's classic guide to value investing", "TXT-019", 22.99m, 75, 8, new DateTime(2024, 4, 3), new DateTime(2024, 4, 3)));
         await products.AddAsync(new ProductDto(0, "Competitive Strategy", "Michael Porter's framework for industry analysis", "TXT-020", 49.99m, 35, 9, new DateTime(2024, 4, 5), new DateTime(2024, 4, 5)));
         await products.AddAsync(new ProductDto(0, "Organizational Behaviour", "Understanding people and groups in the workplace", "TXT-021", 74.99m, 40, 9, new DateTime(2024, 4, 7), new DateTime(2024, 4, 7)));
+        await products.AddAsync(new ProductDto(0, "Introduction to Probability and Statistics", "Mendenhall & Sincich's accessible guide to statistical inference", "TXT-022", 84.99m, 30, 10, new DateTime(2024, 4, 9), new DateTime(2024, 4, 9)));
+        await products.AddAsync(new ProductDto(0, "Discrete Mathematics and Its Applications", "Kenneth Rosen's comprehensive introduction to discrete structures", "TXT-023", 89.99m, 27, 11, new DateTime(2024, 4, 11), new DateTime(2024, 4, 11)));
     }
 }
