@@ -20,6 +20,13 @@
         (categoryChange)="onCategoryChange($event)"
       />
     </div>
+    <div class="sort-wrapper">
+      <select class="sort-select" [value]="sortBy$ | async" (change)="onSortChange($any($event.target).value)">
+        @for (opt of sortOptions; track opt.value) {
+          <option [value]="opt.value">{{ opt.label }}</option>
+        }
+      </select>
+    </div>
   </div>
 
   <app-product-list
