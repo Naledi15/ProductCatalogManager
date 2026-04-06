@@ -54,11 +54,19 @@ public class ProductsController(
             totalPages = (int)Math.Ceiling(totalCount / (double)pageSize)
         });
     }
-
+    
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetProduct(int id)
+    public async Task<IActionResult> GetProduct()
     {
+        var routeId = RouteData.Values["id"]?.ToString();
+
+        if (string.IsNullOrEmpty(routeId) || !int.TryParse(routeId, out int id))
+        {
+            return BadRequest("A valid integer ID must be provided in the URL.");
+        }
+
         var product = await products.GetByIdAsync(id);
+        
         return product is null ? NotFound() : Ok(product);
     }
 
