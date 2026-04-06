@@ -16,6 +16,7 @@ interface SortOption { label: string; value: string; }
 
 const IN_STOCK = '__in_stock__';
 const OUT_STOCK = '__out_stock__';
+const PAGE_SIZE = 10;
 
 @Component({
   selector: 'app-products-page',
@@ -31,6 +32,7 @@ export class ProductsPage {
   private readonly searchTerm$ = new BehaviorSubject<string>('');
   readonly selectedCategoryId$ = new BehaviorSubject<number | null>(null);
   readonly sortBy$ = new BehaviorSubject<string | null>(null);
+  readonly currentPage$ = new BehaviorSubject<number>(1);
 
   readonly sortOptions: SortOption[] = [
     { label: 'Default',          value: '' },
@@ -53,6 +55,7 @@ export class ProductsPage {
 
   readonly categories$ = this.categoryService.categories$;
   readonly loading$ = this.productService.loading$;
+  readonly totalPages$ = this.productService.totalPages$;
 
   readonly displayProducts$ = combineLatest([
     this.productService.products$,
@@ -69,20 +72,31 @@ export class ProductsPage {
       this.searchTerm$.pipe(debounceTime(300), distinctUntilChanged(), startWith('')),
       this.selectedCategoryId$,
       this.sortBy$,
+      this.currentPage$,
     ]).pipe(
-      switchMap(([search, categoryId, dropdown]) => {
+      switchMap(([search, categoryId, dropdown, page]) => {
         const isStock = dropdown === IN_STOCK || dropdown === OUT_STOCK;
         const sortBy = isStock ? null : (dropdown || null);
         const inStock = dropdown === IN_STOCK;
-        return this.productService.loadProducts({ search: search || null, categoryId, sortBy, inStock, page: 1, pageSize: 20 });
+        // Out of Stock is filtered client-side, so load everything in one request
+        const outStock = dropdown === OUT_STOCK;
+        return this.productService.loadProducts({
+          search: search || null,
+          categoryId,
+          sortBy,
+          inStock,
+          page: outStock ? 1 : page,
+          pageSize: outStock ? 100 : PAGE_SIZE,
+        });
       }),
       takeUntilDestroyed(),
     ).subscribe();
   }
 
-  onSearch(term: string): void { this.searchTerm$.next(term); }
-  onCategoryChange(id: number | null): void { this.selectedCategoryId$.next(id); }
-  onSortChange(value: string): void { this.sortBy$.next(value || null); }
+  onSearch(term: string): void { this.currentPage$.next(1); this.searchTerm$.next(term); }
+  onCategoryChange(id: number | null): void { this.currentPage$.next(1); this.selectedCategoryId$.next(id); }
+  onSortChange(value: string): void { this.currentPage$.next(1); this.sortBy$.next(value || null); }
+  onPageChange(page: number): void { this.currentPage$.next(page); }
 
   get selectedDropdownValue(): string { return this.sortBy$.value ?? ''; }
 

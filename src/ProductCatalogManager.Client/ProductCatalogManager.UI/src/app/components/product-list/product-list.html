@@ -39,7 +39,7 @@
           <p class="product-sku">SKU: {{ product.sku }}</p>
           <p class="product-description">{{ product.description }}</p>
           <div class="product-footer">
-            <span class="product-price">{{ product.price | currency }}</span>
+            <span class="product-price">{{ product.price | currency:'ZAR':'R ' }}</span>
             <span class="product-qty">Qty: {{ product.quantity }}</span>
           </div>
           <div class="product-actions">
@@ -73,7 +73,7 @@
               </td>
               <td><code class="sku-code">{{ product.sku }}</code></td>
               <td><span class="category-badge">{{ getCategoryName(product.categoryId) }}</span></td>
-              <td>{{ product.price | currency }}</td>
+              <td>{{ product.price | currency:'ZAR':'R ' }}</td>
               <td><span [class.low-stock]="product.quantity < 10">{{ product.quantity }}</span></td>
               <td>
                 <div class="table-actions">
