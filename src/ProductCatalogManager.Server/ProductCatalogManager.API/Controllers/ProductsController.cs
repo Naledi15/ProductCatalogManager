@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using ProductCatalogManager.API.Contracts.Requests.Products;
+using ProductCatalogManager.API.Contracts.Responses;
 using ProductCatalogManager.Domain.DTOs;
 using ProductCatalogManager.Domain.Helpers;
 using ProductCatalogManager.Domain.Interfaces;
@@ -17,7 +18,7 @@ public class ProductsController(
     [FromKeyedServices("products")] CacheLayer productCache) : ControllerBase
 {
     [HttpGet]
-    public async Task<IActionResult> GetProducts([FromQuery] ProductParameters parameters)
+    public async Task<ActionResult<PagedResponse<ProductResponse>>> GetProducts([FromQuery] ProductParameters parameters)
     {
         // Cache the filtered (unsorted, unpaged) list; sort + page after retrieval.
         var filterKey = $"products:cat={parameters.CategoryId}:s={parameters.Search}:min={parameters.MinPrice}:max={parameters.MaxPrice}:stock={parameters.InStock}";
@@ -36,16 +37,18 @@ public class ProductsController(
         ProductComparers.SortBy(sorted, parameters.SortBy);
 
         var totalCount = sorted.Count;
-        var items = sorted.Skip((parameters.Page - 1) * parameters.PageSize).Take(parameters.PageSize).ToList();
+        var items = sorted
+            .Skip((parameters.Page - 1) * parameters.PageSize)
+            .Take(parameters.PageSize)
+            .Select(p => new ProductResponse(p.Id, p.Name, p.Description, p.SKU, p.Price, p.Quantity, p.CategoryId, p.CreatedAt, p.UpdatedAt))
+            .ToList();
 
-        return Ok(new
-        {
+        return Ok(new PagedResponse<ProductResponse>(
             items,
             totalCount,
-            page = parameters.Page,
-            pageSize = parameters.PageSize,
-            totalPages = (int)Math.Ceiling(totalCount / (double)parameters.PageSize)
-        });
+            parameters.Page,
+            parameters.PageSize,
+            (int)Math.Ceiling(totalCount / (double)parameters.PageSize)));
     }
     
     [HttpGet("{id}")]
