@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
     <ProjectReference Include="..\ProductCatalogManager.Domain\ProductCatalogManager.Domain.csproj" />
   </ItemGroup>
 

@@ -8,6 +8,19 @@ public sealed class ValidationFilter(IServiceProvider serviceProvider) : IAsyncA
 {
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
+        if (!context.ModelState.IsValid)
+        {
+            var bindingErrors = context.ModelState
+                .Where(e => e.Value?.Errors.Count > 0)
+                .ToDictionary(
+                    e => e.Key,
+                    e => e.Value!.Errors.Select(x =>
+                        string.IsNullOrEmpty(x.ErrorMessage) ? "Invalid value." : x.ErrorMessage).ToArray());
+
+            context.Result = new BadRequestObjectResult(new ValidationProblemDetails(bindingErrors));
+            return;
+        }
+
         foreach (var (_, value) in context.ActionArguments)
         {
             if (value is null) continue;
