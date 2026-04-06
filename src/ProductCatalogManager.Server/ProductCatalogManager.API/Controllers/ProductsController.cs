@@ -71,7 +71,7 @@ public class ProductsController(
         [FromQuery] string? name = null,
         [FromQuery] int? categoryId = null)
     {
-        var results = await searchEngine.SearchAsync(name, categoryId);
+        var results = await searchEngine.SearchByNameandCategoryAsync(name, categoryId);
         return Ok(results);
     }
 
