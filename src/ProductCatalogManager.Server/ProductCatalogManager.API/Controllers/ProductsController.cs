@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using ProductCatalogManager.API.Contracts.Requests.Products;
 using ProductCatalogManager.Domain.DTOs;
+using ProductCatalogManager.Domain.Helpers;
 using ProductCatalogManager.Domain.Interfaces;
 using ProductCatalogManager.Queries;
 
@@ -10,7 +12,8 @@ namespace ProductCatalogManager.API.Controllers;
 [Route("api/[controller]")]
 public class ProductsController(
     IProductRepository products,
-    IProductSearchEngine searchEngine) : ControllerBase
+    IProductSearchEngine searchEngine,
+    [FromKeyedServices("products")] CacheLayer productCache) : ControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> GetProducts(
@@ -23,15 +26,24 @@ public class ProductsController(
         [FromQuery] bool inStock = false,
         [FromQuery] string? sortBy = null)
     {
-        var (items, totalCount) = (await products.GetAllAsync())
-            .AsQueryable()
-            .InCategory(categoryId)
-            .MatchingSearch(search)
-            .InPriceRange(minPrice, maxPrice)
-            .InStockOnly(inStock)
-            .ToPage(page, pageSize);
+        // Cache the filtered (unsorted, unpaged) list; sort + page after retrieval.
+        var filterKey = $"products:cat={categoryId}:s={search}:min={minPrice}:max={maxPrice}:stock={inStock}";
+        var filtered = await productCache.GetOrCreateAsync(filterKey, async () =>
+        {
+            var all = await products.GetAllAsync();
+            return all.AsQueryable()
+                .InCategory(categoryId)
+                .MatchingSearch(search)
+                .InPriceRange(minPrice, maxPrice)
+                .InStockOnly(inStock)
+                .ToList();
+        });
 
-        ProductComparers.SortBy(items, sortBy);
+        var sorted = filtered.ToList();
+        ProductComparers.SortBy(sorted, sortBy);
+
+        var totalCount = sorted.Count;
+        var items = sorted.Skip((page - 1) * pageSize).Take(pageSize).ToList();
 
         return Ok(new
         {
@@ -42,11 +54,19 @@ public class ProductsController(
             totalPages = (int)Math.Ceiling(totalCount / (double)pageSize)
         });
     }
-
+    
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetProduct(int id)
+    public async Task<IActionResult> GetProduct()
     {
+        var routeId = RouteData.Values["id"]?.ToString();
+
+        if (string.IsNullOrEmpty(routeId) || !int.TryParse(routeId, out int id))
+        {
+            return BadRequest("A valid integer ID must be provided in the URL.");
+        }
+
         var product = await products.GetByIdAsync(id);
+        
         return product is null ? NotFound() : Ok(product);
     }
 
