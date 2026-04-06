@@ -8,7 +8,7 @@ using ProductCatalogManager.API.Middleware;
 using ProductCatalogManager.Domain.Data;
 using ProductCatalogManager.Domain.Interfaces;
 using ProductCatalogManager.Domain.Repositories;
-using ProductCatalogManager.Domain.Services;
+using ProductCatalogManager.Domain.Helpers;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,11 +22,9 @@ builder.Services.AddDbContext<CatalogDbContext>(options =>
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddSingleton<ICategoryRepository, CategoryRepository>();
 builder.Services.AddMemoryCache();
-builder.Services.AddScoped<ProductSearchEngine>();
-builder.Services.AddScoped<IProductSearchEngine, SearchResultCaching>(
-    sp => new SearchResultCaching(
-        sp.GetRequiredService<ProductSearchEngine>(),
-        sp.GetRequiredService<IMemoryCache>()));
+builder.Services.AddKeyedSingleton<CacheLayer>("products");
+builder.Services.AddKeyedSingleton<CacheLayer>("categories");
+builder.Services.AddScoped<IProductSearchEngine, ProductSearchEngine>();
 builder.Services.AddValidatorsFromAssemblyContaining<ProductRequestValidator>();
 
 var app = builder.Build();
