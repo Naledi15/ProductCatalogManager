@@ -8,4 +8,8 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ProductCatalogManager.Utilities\ProductCatalogManager.Utilities.csproj" />
+  </ItemGroup>
+
 </Project>

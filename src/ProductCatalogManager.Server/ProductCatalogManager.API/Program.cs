@@ -1,4 +1,5 @@
 using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProductCatalogManager.API.Contracts.Requests.Products;
 using ProductCatalogManager.API.Data;
@@ -18,6 +19,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 builder.Services.AddControllers(options => options.Filters.Add<ValidationFilter>())
     .AddJsonOptions(o => o.JsonSerializerOptions.Converters.Add(new CategoryTreeNodeConverter()));
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+    options.SuppressModelStateInvalidFilter = true);
 builder.Services.AddDbContext<CatalogDbContext>(options =>
     options.UseInMemoryDatabase("ProductCatalogDb"));
 builder.Services.AddSingleton<IProductRepository, ProductRepository>();
