@@ -14,11 +14,8 @@ public class CategoriesController(ICategoryRepository categories) : ControllerBa
         Ok(await categories.GetAllAsync());
 
     [HttpGet("tree")]
-    public async Task<IActionResult> GetCategoryTree()
-    {
-        var all = (await categories.GetAllAsync()).ToList();
-        return Ok(BuildTree(all, null));
-    }
+    public async Task<IActionResult> GetCategoryTree() =>
+        Ok(await categories.GetTreeAsync());
 
     [HttpPost]
     public async Task<IActionResult> CreateCategory([FromBody] CategoryRequest request)
@@ -27,17 +24,4 @@ public class CategoriesController(ICategoryRepository categories) : ControllerBa
             new CategoryDTO(0, request.Name, request.Description, request.ParentCategoryId));
         return CreatedAtAction(nameof(GetCategories), new { id = category.Id }, category);
     }
-
-    private static List<CategoryTreeNode> BuildTree(List<CategoryDTO> all, int? parentId) =>
-        all
-            .Where(c => c.ParentCategoryId == parentId)
-            .Select(c => new CategoryTreeNode(c.Id, c.Name, c.Description, c.ParentCategoryId, BuildTree(all, c.Id)))
-            .ToList();
 }
-
-public record CategoryTreeNode(
-    int Id,
-    string Name,
-    string Description,
-    int? ParentCategoryId,
-    List<CategoryTreeNode> Children);
