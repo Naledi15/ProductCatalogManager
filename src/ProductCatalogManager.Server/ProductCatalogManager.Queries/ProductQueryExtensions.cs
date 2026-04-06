@@ -28,18 +28,6 @@ public static class ProductQueryExtensions
     public static IQueryable<ProductDto> InStockOnly(this IQueryable<ProductDto> query, bool inStockOnly) =>
         inStockOnly ? query.Where(p => p.Quantity > 0) : query;
 
-    /// <summary>Sorts by a named field; defaults to Id ascending.</summary>
-    public static IQueryable<ProductDto> SortBy(this IQueryable<ProductDto> query, string? sortBy) =>
-        sortBy?.ToLowerInvariant() switch
-        {
-            "name"       => query.OrderBy(p => p.Name),
-            "name_desc"  => query.OrderByDescending(p => p.Name),
-            "price"      => query.OrderBy(p => p.Price),
-            "price_desc" => query.OrderByDescending(p => p.Price),
-            "quantity"   => query.OrderBy(p => p.Quantity),
-            _            => query.OrderBy(p => p.Id)
-        };
-
     /// <summary>Returns a single page of results along with total count metadata.</summary>
     public static (List<ProductDto> Items, int TotalCount) ToPage(
         this IQueryable<ProductDto> query, int page, int pageSize)

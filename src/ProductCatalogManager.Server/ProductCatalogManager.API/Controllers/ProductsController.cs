@@ -29,8 +29,9 @@ public class ProductsController(
             .MatchingSearch(search)
             .InPriceRange(minPrice, maxPrice)
             .InStockOnly(inStock)
-            .SortBy(sortBy)
             .ToPage(page, pageSize);
+
+        ProductComparers.SortBy(items, sortBy);
 
         return Ok(new
         {
