@@ -21,12 +21,12 @@ builder.Services.AddControllers(options => options.Filters.Add<ValidationFilter>
     .AddJsonOptions(o => o.JsonSerializerOptions.Converters.Add(new CategoryTreeNodeConverter()));
 builder.Services.AddDbContext<CatalogDbContext>(options =>
     options.UseInMemoryDatabase("ProductCatalogDb"));
-builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddSingleton<IProductRepository, ProductRepository>();
 builder.Services.AddSingleton<ICategoryRepository, CategoryRepository>();
 builder.Services.AddMemoryCache();
 builder.Services.AddKeyedSingleton<CacheLayer>("products");
 builder.Services.AddKeyedSingleton<CacheLayer>("categories");
-builder.Services.AddScoped<IProductSearchEngine, ProductSearchEngine>();
+builder.Services.AddSingleton<IProductSearchEngine, ProductSearchEngine>();
 builder.Services.AddValidatorsFromAssemblyContaining<ProductRequestValidator>();
 
 var app = builder.Build();

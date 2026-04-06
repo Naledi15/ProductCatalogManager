@@ -5,6 +5,7 @@ using ProductCatalogManager.Domain.DTOs;
 using ProductCatalogManager.Domain.Helpers;
 using ProductCatalogManager.Domain.Interfaces;
 using ProductCatalogManager.Queries;
+using ProductCatalogManager.Queries.Models;
 
 namespace ProductCatalogManager.API.Controllers;
 
@@ -16,42 +17,34 @@ public class ProductsController(
     [FromKeyedServices("products")] CacheLayer productCache) : ControllerBase
 {
     [HttpGet]
-    public async Task<IActionResult> GetProducts(
-        [FromQuery] int page = 1,
-        [FromQuery] int pageSize = 10,
-        [FromQuery] int? categoryId = null,
-        [FromQuery] string? search = null,
-        [FromQuery] decimal? minPrice = null,
-        [FromQuery] decimal? maxPrice = null,
-        [FromQuery] bool inStock = false,
-        [FromQuery] string? sortBy = null)
+    public async Task<IActionResult> GetProducts([FromQuery] ProductParameters parameters)
     {
         // Cache the filtered (unsorted, unpaged) list; sort + page after retrieval.
-        var filterKey = $"products:cat={categoryId}:s={search}:min={minPrice}:max={maxPrice}:stock={inStock}";
+        var filterKey = $"products:cat={parameters.CategoryId}:s={parameters.Search}:min={parameters.MinPrice}:max={parameters.MaxPrice}:stock={parameters.InStock}";
         var filtered = await productCache.GetOrCreateAsync(filterKey, async () =>
         {
             var all = await products.GetAllAsync();
             return all.AsQueryable()
-                .InCategory(categoryId)
-                .MatchingSearch(search)
-                .InPriceRange(minPrice, maxPrice)
-                .InStockOnly(inStock)
+                .InCategory(parameters.CategoryId)
+                .MatchingSearch(parameters.Search)
+                .InPriceRange(parameters.MinPrice, parameters.MaxPrice)
+                .InStockOnly(parameters.InStock)
                 .ToList();
         });
 
         var sorted = filtered.ToList();
-        ProductComparers.SortBy(sorted, sortBy);
+        ProductComparers.SortBy(sorted, parameters.SortBy);
 
         var totalCount = sorted.Count;
-        var items = sorted.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+        var items = sorted.Skip((parameters.Page - 1) * parameters.PageSize).Take(parameters.PageSize).ToList();
 
         return Ok(new
         {
             items,
             totalCount,
-            page,
-            pageSize,
-            totalPages = (int)Math.Ceiling(totalCount / (double)pageSize)
+            page = parameters.Page,
+            pageSize = parameters.PageSize,
+            totalPages = (int)Math.Ceiling(totalCount / (double)parameters.PageSize)
         });
     }
     
