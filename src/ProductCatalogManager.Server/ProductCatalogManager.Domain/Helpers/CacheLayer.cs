@@ -2,15 +2,12 @@ namespace ProductCatalogManager.Domain.Helpers;
 
 /// <summary>
 /// A simple in-memory cache group backed by a Dictionary.
-/// Register one instance per logical cache group (e.g. products, categories).
-/// All entries are evicted together when Invalidate() is called.
 /// </summary>
 public sealed class CacheLayer
 {
     private readonly object _lock = new();
     private Dictionary<string, object> _store = new();
 
-    /// <summary>Returns a cached value, or invokes <paramref name="factory"/> to compute and store it.</summary>
     public async Task<T> GetOrCreateAsync<T>(string key, Func<Task<T>> factory) where T : class
     {
         lock (_lock)

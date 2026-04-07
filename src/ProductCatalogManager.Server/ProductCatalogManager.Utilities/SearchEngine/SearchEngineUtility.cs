@@ -2,7 +2,6 @@ namespace ProductCatalogManager.Utilities.SearchEngine;
 
 /// <summary>
 /// Generic in-memory search engine with fuzzy matching and multi-field weighted scoring.
-/// No external libraries — pure C# only.
 ///
 /// Scoring tiers (per field, normalised to [0, 1] then multiplied by field weight):
 ///   1.00 — exact match
