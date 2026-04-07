@@ -43,4 +43,19 @@
     (edit)="onEdit($event)"
     (delete)="onDelete($event)"
   />
+
+  @let totalPages = (totalPages$ | async) ?? 0;
+  @let currentPage = (currentPage$ | async) ?? 1;
+
+  @if (totalPages > 1) {
+    <div class="pagination">
+      <button class="pagination-btn" (click)="onPageChange(currentPage - 1)" [disabled]="currentPage <= 1">
+        &lsaquo; Prev
+      </button>
+      <span class="pagination-info">Page {{ currentPage }} of {{ totalPages }}</span>
+      <button class="pagination-btn" (click)="onPageChange(currentPage + 1)" [disabled]="currentPage >= totalPages">
+        Next &rsaquo;
+      </button>
+    </div>
+  }
 </div>
